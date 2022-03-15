@@ -1,0 +1,23 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon --exec ts-node src/index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/express": "^4.17.13",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^17.0.21",
+    "body-parser": "^1.19.2",
+    "expree": "^0.1.6",
+    "mongoose": "^6.2.6",
+    "node": "^17.5.0",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  }
+}
