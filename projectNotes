@@ -1,0 +1,245 @@
+       NodeJs 
+NodeJs used internally code is javascript
+this is server environment
+    uses of nodejs
+nodesJs mostly used for api 
+nodeJs is super fast for api
+So we can connect the same database with web app mobile app
+    REPL
+Read,Eval,Print,Loop
+    ExpressJs
+ expressjs is a backend web application framework for nodejs
+ ----------------------------------------------creating server-----------------------------------
+ //how to create web server with typescript and express
+
+const express = require ('express')
+const app = express()
+const port = 8000
+   app.get('/',(req,res)=>{
+     res.send("web server connected ")
+     })
+     app.listen(port,()=>{
+        console.log("Port number used ${port}) 
+        
+        })
+-------------------------------------------creating routes--------------------------------------
+Route => when a user g for login then he send a request to url that request is route
+
+there are four methods to route
+app.get() => get is used for retrieve data
+app.post() => post is used for adding something
+app.patch() => patch is used for update something
+app.put() => put is used for update full user or replace that user
+app.delete() => delete is used for delete something
+   example =>
+   const express = require ('express')
+  const app = express()
+  const port = 5000
+     app.get('/',(req,res)=>{
+       res.send("server created")
+   })
+    app.get('/about',(req,res)=>{
+      res.send("tell about us")
+   })
+    app.listen(port,()=>{
+      console.log(`port number is ${port}`)
+  })
+-----------------------------------------midlleware---------------------------------------------------
+Middleware => is basically used for handling request on routes.
+
+const express = require ('express')
+const app = express()
+const port = 7000
+
+app.listen(port,()=>{
+    console.log(`port number is ${port}`)
+})
+
+app.use((req,res,next)=>{
+    console.log("middleware connected")
+    next()
+})
+
+app.get('/api/user/login',(req,res,next)=>{
+    const data = [{
+        name:'sahil'
+    }]
+    req.user=data;
+    next()
+},(req,res,next)=>{
+    console.log("another midware called");
+    res.send(req.user);
+    next();
+  
+})
+app.get('/api/user/signup',(req,res)=>{
+     res.send("tell about us")
+})
+---------------------------------------------connect database----------------------------------------------------
+How to connect database
+import * as express from 'express';
+import * as mongoose from 'mongoose';
+const app : express.Application = express()
+const port = 7000
+
+app.listen(port,()=>{
+    console.log(`port number is ${port}`)
+})
+ 
+mongoose.connect("mongodb+srv://sahil:myuser@project.7wowg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+)
+.then(()=>{
+    console.log('mongodb is connected')
+})
+
+app.use((req,res,next)=>{
+    console.log("middleware connected")
+    next()
+})
+
+app.get('/login',(req:any,res,next)=>{
+    const data = {
+        name:'sahil'
+    }
+    res.send({status:200,message:"",data:data})
+    next()
+})
+app.get('/signup',(req,res)=>{
+     const data = "tell about us"
+     res.send({status:200,Message:"",data:data})
+})
+
+---------------------------------------------------environment---------------------------------------------------------
+
+Handling Environment Variables
+    dev.env.ts
+    
+    import {Environment} from "./env";
+export const DevEnvironment : Environment =
+{
+    db_url :"dev connected"
+}
+-------------------------------------------------------------------
+      prod.env.ts
+import {Environment} from "./env";
+export const ProdEnvironment : Environment =
+{
+    db_url : ("mongodb+srv://sahil:myuser@project.7wowg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+}      
+ ----------------------------------------------------------------------
+        env.ts
+            import { DevEnvironment } from "./dev.env";
+import { ProdEnvironment } from "./prod.env";
+
+export interface Environment {
+    db_url: string
+}
+
+export function getEnvironmentVariables()
+{
+    if(process.env.NODE_ENV ='Developement')
+    {
+     return ProdEnvironment;
+}
+return DevEnvironment;
+}
+----------------------------------------------------------------------Server.ts--------------------------------------------------------------
+import * as express from 'express'
+import { getEnvironmentVariables } from './environments/env'
+import userRoutes from './Routers/userRoutes'
+import * as mongoose from 'mongoose'
+import { STATUS_CODES } from 'http'
+export class Server {
+     public app: express.Application = express()
+
+     constructor() {
+          this.SetConfigurations()
+          this.SetRoutes()
+          this.error404Handler()
+          this.handleErrors()
+     }
+
+     SetConfigurations() {
+          this.setMongodb()
+     }
+     setMongodb() {
+          const databaseUr1 = getEnvironmentVariables().db_url
+
+          mongoose.connect(databaseUr1)
+               .then(() => {
+                    console.log('mongodb is connected')
+               })
+     }
+
+
+     SetRoutes() {
+          this.app.use('/api/user', userRoutes)
+
+     }
+     error404Handler() {
+          this.app.use((req, res) => {
+               res.status(404).json({ status: 404, message: 'user not found' });
+          })
+
+     }
+     handleErrors() {
+          this.app.use((error:any, req:any, res:any, next:any) => {
+
+               const errorStatus = req.errorStatus || 500;
+
+               res.status(errorStatus).json({ status: errorStatus, message: error.message || 'something went wrong. Please try again later' })
+
+          })
+     }
+}
+----------------------------------------routes UserControllers---------------------------------------
+ export class UserController 
+{
+    static login (req,res,next:any)
+    {
+        const error = new Error('user does not exist')
+        next(error)
+        res.send(req.query)
+    }
+   
+}
+
+-------------------------------------Userroutes------------------------------------------------
+import { Router } from "express";
+import path = require("path");
+import { UserController } from "./UserController";
+
+class userRouter {
+  public router: Router;
+  constructor() {
+
+    this.router = Router()
+    this.getRouters()
+    this.postRouters()
+    this.putRouters()
+    this.patchRouters()
+    this.deleteRouters()
+
+  }
+
+  getRouters() {
+    this.router.get('/login', UserController.login)
+
+  }
+
+  postRouters() {
+
+  }
+  putRouters() {
+
+  }
+  patchRouters() {
+
+  }
+  deleteRouters() {
+
+  }
+
+}
+export default new userRouter().router;
+        
